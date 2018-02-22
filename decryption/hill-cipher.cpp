@@ -14,7 +14,7 @@ int main(int argc, char **argv)
   Matrix ctm = Matrix(ctv);
   Matrix ptm = (key * ctm) % 26;
   std::vector<int> ptv = ptm.toVector();
-  std::string pt = fromNumberVector(ptv, true);
+  std::string pt = fromNumberVector(ptv, false);
   std::cout << pt;
 
   return 0;
