@@ -26,9 +26,13 @@ The build script automatically generates a `message.txt` file to be used as exam
 
 ### Build and Test
 
-There are two batch scripts, `build.bat` and `test.bat`, which are intended to make development of this project easier. The build script compiles the source code into executable files which are dumped into the `builds` directory.
+There are two batch scripts, `build.bat` and `test.bat`, which are intended to make development of this project easier. The build script compiles the source code into executable files using MinGW and dumps the output into the `builds` directory.
 
-The test script runs a series of test on each cipher to ensure that the ciphers are providing basic encryption and decryption features. That is, that encrypting the plaintext obtains the ciphertext and decrypting the ciphertext obtains the plaintext, such that the plaintext is not equal to the ciphertext. 
+The test script builds and runs a series of test on each cipher to ensure that the ciphers are providing basic encryption and decryption features. That is, that encrypting the plaintext obtains the ciphertext and decrypting the ciphertext obtains the plaintext, such that the plaintext is not equal to the ciphertext.
+
+### Dependencies
+
+[MinGW (GCC) Compiler Suite](http://www.mingw.org/wiki/InstallationHOWTOforMinGW)
 
 ### License
 
