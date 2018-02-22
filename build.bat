@@ -1,4 +1,5 @@
 @echo off
+echo Building Ciphers
 set originalpath=%~dp0
 set buildspath=%~dp0builds\
 set encryptionpath=%~dp0encryption\
