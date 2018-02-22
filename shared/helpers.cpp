@@ -9,16 +9,18 @@
 #include "cmath"
 
 #include "./matrix.h"
+#include "./mathUtilities.cpp"
 
 std::vector<int> toNumberVector(std::string s);
 std::string fromNumberVector(std::vector<int> v, bool uppercase);
 int toNumber(char c);
+int toNumber(std::string s);
 char toCharacter(int n, bool uppercase = true);
 bool isalphaonly(std::string s);
 std::string getInput();
 int getNumberKey(int argc, char **argv);
+std::vector<int> getVectorKey(int argc, char **argv);
 Matrix getMatrixKey(int argc, char **argv);
-Matrix multiply(Matrix a, Matrix b);
 
 std::vector<int> toNumberVector(std::string s)
 {
@@ -62,8 +64,29 @@ int toNumber(char c)
   else
   {
     std::cout << "Character not recognized\n";
-    throw "Character not recognized\n";
+    throw;
   }
+}
+
+int toNumber(std::string s)
+{
+  int n = 0;
+  int length = s.length();
+
+  for (int i = 0; i < length; i++)
+  {
+    if (std::isdigit(s[i]))
+    {
+      n += toNumber(s[length - i - 1]) * pow(10, i);
+    }
+    else
+    {
+      std::cout << "Number key must contain only numbers\n";
+      throw;
+    }
+  }
+
+  return n;
 }
 
 char toCharacter(int n, bool uppercase)
@@ -91,40 +114,37 @@ std::string getInput()
   if (isalphaonly(input) == false)
   {
     std::cout << "Input must contain only alphabetic characters\n";
-    throw "Input must contain only alphabetic characters\n";
+    throw;
   }
   return input;
 }
 
 int getNumberKey(int argc, char **argv)
 {
-  int key;
-  if (argc == 2)
+  if (argc != 2)
   {
-    int customKey = toNumber(*argv[1]);
-    if (std::isdigit(*argv[1]))
-    {
-      key = customKey;
-    }
-    else
-    {
-      std::cout << "Key must be a number\n";
-      throw "Key must be a number\n";
-    }
+    std::cout << "Number key must be a number\n";
+    throw;
   }
-  return key;
+
+  return toNumber(argv[1]);
+}
+
+std::vector<int> getVectorKey(int argc, char **argv)
+{
+  std::vector<int> v;
+
+  for (int i = 1; i < argc; i++)
+  {
+    v.push_back(toNumber(argv[i]));
+  }
+
+  return v;
 }
 
 Matrix getMatrixKey(int argc, char **argv)
 {
-  std::vector<int> key;
-
-  for (int i = 1; i < argc; i++)
-  {
-    key.push_back(toNumber(*argv[i]));
-  }
-
-  return Matrix(key);
+  return Matrix(getVectorKey(argc, argv));
 }
 
 #endif

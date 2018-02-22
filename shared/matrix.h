@@ -2,6 +2,7 @@
 #define __MATRIX
 
 #include "vector"
+#include "algorithm"
 
 #include "./mathUtilities.cpp"
 
@@ -10,61 +11,53 @@ class Matrix
 public:
   int rows = 0, columns = 0;
 
-  Matrix(int rows, int columns)
+  Matrix(int rows_p, int columns_p)
   {
-    this->rows = rows;
-    this->columns = columns;
-    this->size = rows * columns;
-    this->allocateMatrix();
+    rows = std::max(rows_p, 0);
+    columns = std::max(columns_p, 0);
+    size = rows * columns;
+    allocateMatrix();
   }
 
-  Matrix(std::vector<int> v, int rows = 3)
+  ~Matrix()
   {
-    this->set(v, rows);
+    deallocateMatrix();
+  }
+
+  Matrix(std::vector<int> v, int rows_p = 3)
+  {
+    create(v, rows_p);
+  }
+
+  Matrix(const Matrix &other)
+  {
+    create(other.toVector(), other.rows);
   }
 
   int get(int row, int column) const
   {
-    return this->m[row][column];
+    validateRowAndColumn(row, column);
+    return m[row][column];
   }
 
   int set(int row, int column, int value)
   {
-    this->m[row][column] = value;
-  }
-
-  void set(std::vector<int> v, int rows = 3)
-  {
-    this->size = v.size();
-    this->rows = rows;
-    this->columns = size % rows == 0 ? size / rows : (size / rows) + 1;
-    this->allocateMatrix();
-
-    for (int column = 0; column < this->columns; column++)
-    {
-      for (int row = 0; row < rows; row++)
-      {
-        int n = (column * this->rows) + row;
-        if (n < size)
-        {
-          this->m[row][column] = v[n];
-        }
-      }
-    }
+    validateRowAndColumn(row, column);
+    m[row][column] = value;
   }
 
   std::vector<int> toVector() const
   {
     std::vector<int> v;
 
-    for (int column = 0; column < this->columns; column++)
+    for (int column = 0; column < columns; column++)
     {
-      for (int row = 0; row < this->rows; row++)
+      for (int row = 0; row < rows; row++)
       {
-        int n = (column * this->rows) + row;
-        if (n < this->size)
+        int n = (column * rows) + row;
+        if (n < size)
         {
-          v.push_back(this->m[row][column]);
+          v.push_back(m[row][column]);
         }
       }
     }
@@ -74,14 +67,56 @@ public:
 
   void print() const
   {
-    for (int row = 0; row < this->rows; row++)
+    for (int row = 0; row < rows; row++)
     {
-      for (int column = 0; column < this->columns; column++)
+      for (int column = 0; column < columns; column++)
       {
-        std::cout << this->m[row][column] << ' ';
+        std::cout << m[row][column] << ' ';
       }
       std::cout << '\n';
     }
+  }
+
+  Matrix &operator=(const Matrix &rhs)
+  {
+    create(rhs.toVector(), rhs.rows);
+    return *this;
+  }
+
+  Matrix operator%(const int n)
+  {
+    Matrix result = Matrix(rows, columns);
+
+    for (int row = 0; row < rows; row++)
+    {
+      for (int column = 0; column < columns; column++)
+      {
+        result.set(row, column, mod(get(row, column), n));
+      }
+    }
+
+    return result;
+  }
+
+  Matrix operator*(const Matrix &rhs)
+  {
+    if (columns != rhs.rows)
+    {
+      std::cout << "Matrix multiplication is not defined for these matrices\n";
+      throw;
+    }
+
+    Matrix c = Matrix(rows, rhs.columns);
+
+    for (int row = 0; row < c.rows; row++)
+    {
+      for (int column = 0; column < c.columns; column++)
+      {
+        c.set(row, column, getMatrixProductEntry(*this, rhs, row, column));
+      }
+    }
+
+    return c;
   }
 
 private:
@@ -90,70 +125,77 @@ private:
 
   void allocateMatrix()
   {
-    this->m = new int *[this->rows];
-    for (int i = 0; i < this->rows; ++i)
+    m = new int *[rows];
+    for (int i = 0; i < rows; ++i)
     {
-      m[i] = new int[this->columns];
+      m[i] = new int[columns];
     }
   }
 
   void deallocateMatrix()
   {
-    for (int i = 0; i < this->columns; ++i)
+    for (int i = 0; i < rows; ++i)
     {
       delete[] m[i];
     }
     delete[] m;
   }
-};
 
-// Helper For Multiply Method
-int getMatrixProductEntry(Matrix a, Matrix b, int row, int column)
-{
-  int acc = 0;
-
-  for (int c = 0; c < a.columns; c++)
+  void create(std::vector<int> v, int rows_p = 3)
   {
-    acc += a.get(row, c) * b.get(c, column);
-  }
+    size = v.size();
+    rows = std::max(rows_p, 1);
+    columns = size % rows == 0 ? size / rows : (size / rows) + 1;
+    allocateMatrix();
 
-  return acc;
-}
-
-Matrix operator*(const Matrix &a, const Matrix &b)
-{
-  if (a.columns != b.rows)
-  {
-    std::cout << "Matrix multiplication is not defined for these matrices";
-    throw "Matrix multiplication is not defined for these matrices";
-  }
-
-  Matrix c(a.rows, b.columns);
-
-  for (int row = 0; row < c.rows; row++)
-  {
-    for (int column = 0; column < c.columns; column++)
+    for (int column = 0; column < columns; column++)
     {
-      c.set(row, column, getMatrixProductEntry(a, b, row, column));
-    }
-  }
-
-  return c;
-}
-
-Matrix operator%(const Matrix &a, const int n)
-  {
-    Matrix newmatrix(a.rows, a.columns);
-
-    for (int row = 0; row < a.rows; row++)
-    {
-      for (int column = 0; column < a.columns; column++)
+      for (int row = 0; row < rows; row++)
       {
-        newmatrix.set(row, column, mod(a.get(row, column), n));
+        int n = (column * rows) + row;
+        if (n < size)
+        {
+          m[row][column] = v[n];
+        }
       }
     }
-
-    return newmatrix;
   }
+
+  void validateRowAndColumn(int row, int column) const
+  {
+    if (validRow(row) == false)
+    {
+      std::cout << "Invalid row\n";
+      throw;
+    }
+
+    if (validColumn(column) == false)
+    {
+      std::cout << "Invalid column\n";
+    }
+  }
+
+  bool validRow(int row) const
+  {
+    return row >= 0 && row < rows;
+  }
+
+  bool validColumn(int column) const
+  {
+    return column >= 0 && column < columns;
+  }
+
+  int getMatrixProductEntry(const Matrix &a, const Matrix &b, int row, int column)
+  {
+    int acc = 0;
+
+    for (int c = 0; c < a.columns; c++)
+    {
+      acc += a.get(row, c) * b.get(c, column);
+    }
+
+    return acc;
+  }
+};
 
 #endif
