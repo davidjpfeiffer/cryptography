@@ -1,29 +1,24 @@
+#ifndef __HELPERS
+#define __HELPERS
+
 #include "iostream"
 #include "string"
 #include "locale"
 #include "cctype"
 #include "vector"
+#include "cmath"
 
-const int defaultKey = 2;
+#include "./matrix.h"
 
-int mod(int n, int m);
 std::vector<int> toNumberVector(std::string s);
 std::string fromNumberVector(std::vector<int> v, bool uppercase);
 int toNumber(char c);
 char toCharacter(int n, bool uppercase = true);
 bool isalphaonly(std::string s);
-std::string getMessage();
-int getKey(int argc, char **argv);
-
-int mod(int n, int m)
-{
-  while(n < 0)
-  {
-    n += m;
-  }
-
-  return n % m;
-}
+std::string getInput();
+int getNumberKey(int argc, char **argv);
+Matrix getMatrixKey(int argc, char **argv);
+Matrix multiply(Matrix a, Matrix b);
 
 std::vector<int> toNumberVector(std::string s)
 {
@@ -66,7 +61,8 @@ int toNumber(char c)
   }
   else
   {
-    throw "Character not recognized in toNumber method\n";
+    std::cout << "Character not recognized\n";
+    throw "Character not recognized\n";
   }
 }
 
@@ -88,20 +84,21 @@ bool isalphaonly(std::string s)
   return true;
 }
 
-std::string getMessage()
+std::string getInput()
 {
-  std::string message;
-  std::cin >> message;
-  if (isalphaonly(message) == false)
+  std::string input;
+  std::cin >> input;
+  if (isalphaonly(input) == false)
   {
-    throw "Message must contain only alphabetic characters\n";
+    std::cout << "Input must contain only alphabetic characters\n";
+    throw "Input must contain only alphabetic characters\n";
   }
-  return message;
+  return input;
 }
 
-int getKey(int argc, char **argv)
+int getNumberKey(int argc, char **argv)
 {
-  int key = defaultKey;
+  int key;
   if (argc == 2)
   {
     int customKey = toNumber(*argv[1]);
@@ -111,8 +108,23 @@ int getKey(int argc, char **argv)
     }
     else
     {
+      std::cout << "Key must be a number\n";
       throw "Key must be a number\n";
     }
   }
   return key;
 }
+
+Matrix getMatrixKey(int argc, char **argv)
+{
+  std::vector<int> key;
+
+  for (int i = 1; i < argc; i++)
+  {
+    key.push_back(toNumber(*argv[i]));
+  }
+
+  return Matrix(key);
+}
+
+#endif
