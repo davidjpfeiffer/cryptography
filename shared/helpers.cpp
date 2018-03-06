@@ -7,6 +7,7 @@
 #include "cctype"
 #include "vector"
 #include "cmath"
+#include "utility"
 
 #include "./matrix.h"
 #include "./mathUtilities.cpp"
@@ -81,7 +82,7 @@ int toNumber(std::string s)
     }
     else
     {
-      std::cout << "Number key must contain only numbers\n";
+      std::cout << "Key must contain only numbers\n";
       throw;
     }
   }
@@ -123,11 +124,22 @@ int getNumberKey(int argc, char **argv)
 {
   if (argc != 2)
   {
-    std::cout << "Number key must be a number\n";
+    std::cout << "Key must be a number\n";
     throw;
   }
 
   return toNumber(argv[1]);
+}
+
+std::pair<int, int> getPairKey(int argc, char **argv)
+{
+  if (argc != 3)
+  {
+    std::cout << "Key must be a pair\n";
+    throw;
+  }
+
+  return std::make_pair(toNumber(argv[1]), toNumber(argv[2]));
 }
 
 std::vector<int> getVectorKey(int argc, char **argv)
