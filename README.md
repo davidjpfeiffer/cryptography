@@ -11,11 +11,13 @@ A collection of cryptographic ciphers
  
  ### How It Works
 
-The ciphers are written in C++ and compiled to executables using a batch file. Each cipher accepts one optional command line argument, which is the key used to encrypt and decrypt. If no key is provided a default key is used. Upon execution each cipher takes in the message to be encrypted via standard input. This allows the ciphers to be piped togehter.
+The ciphers are written in C++ and compiled to executables using a batch file. Each cipher accepts one optional command line argument, which is the key used to encrypt and decrypt. If no key is provided a default key is used. Each cipher accepts and returns input and output via standard input. This allows the ciphers to be piped togehter.
 
  ### List of Ciphers
  
  - [Shift Cipher](https://en.wikipedia.org/wiki/Caesar_cipher)
+ - [Multiplicative Cipher](https://www.nku.edu/~christensen/section%206%20multiplicative%20ciphers.pdf)
+ - [Affine Cipher](https://en.wikipedia.org/wiki/Affine_cipher)
  - [Hill Cipher](https://en.wikipedia.org/wiki/Hill_cipher)
 
 ### Tips and Tricks
@@ -30,9 +32,7 @@ There are two batch scripts, `build.bat` and `test.bat`, which are intended to m
 
 The test script builds and runs a series of test on each cipher to ensure that the ciphers are providing basic encryption and decryption features. That is, that encrypting the plaintext obtains the ciphertext and decrypting the ciphertext obtains the plaintext, such that the plaintext is not equal to the ciphertext.
 
-### Dependencies
-
-[MinGW (GCC) Compiler Suite](http://www.mingw.org/wiki/InstallationHOWTOforMinGW)
+Note that both scripts use the [MinGW Compiler](http://www.mingw.org/wiki/InstallationHOWTOforMinGW) for compilation. To use these scripts you must have this dependency installed.
 
 ### License
 
