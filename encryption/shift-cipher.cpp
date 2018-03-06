@@ -25,7 +25,7 @@ std::vector<int> encrypt(std::vector<int> ptn, int key)
 
   for (int i = 0; i < ctn.size(); i++)
   {
-    ctn[i] = mod(ptn[i] + keys.shiftCipher.encryptionKey, 26);
+    ctn[i] = mod(ptn[i] + key, 26);
   }
 
   return ctn;
